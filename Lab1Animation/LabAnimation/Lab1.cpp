@@ -10,6 +10,7 @@
 #include "Lab1.h"
 #include "Utils.h"
 #include "Model.h"
+#include "Spline.h"
 
 // ----------- Program Parameters -----
 static int window_width = 1280;
@@ -27,19 +28,36 @@ bool is_hovering = false;
 
 // ----------- Camera Parameters -------
 float rotationX, rotationY;
-float fov = 60;
-float cam2pref = 5;
+float fov = 75;
+float cam2pref = 8;
 float cam2prefLerp = cam2pref;
 bool isOrtho = false;
 float cam_pos[3] = { 0, 0, 0 };
 
-// ----------- Temp Parameters ---------
+// ----------- Scene Parameters ---------
 float m_trans[16] = {
 	1, 0, 0, 0,
 	0, 1, 0, 0,
 	0, 0, 1, 0,
 	0, 0, 0, 1
 };
+bool my_tool_active = true;
+float rotateScale = PI * 5;
+int ctrlPointIndex = 0;
+float selectedPos[3];
+
+// Animation Timeline
+float total_t = 0.0f;
+bool isPlay = true;
+
+// Curves
+Spline spline;
+int curve_type_index = 0;
+int orientation_scheme = 0;
+
+float segment_t = 0;
+int curve_patch = 0;
+
 
 // ----------- Scene Parameters ---------
 float teapot_col[3] = { 0.8f, 0.4f, 0.5f };
@@ -49,39 +67,114 @@ Model teacup("teacup", teacup_col);
 float ground_col[3] = { 0.8f, 0.6f, 0.9f };
 Model ground("ground", ground_col);
 
-void setup(){
+void setup() {
+	glEnable(GL_DEPTH_TEST);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glViewport(0, 0, window_width, window_height);
 
-	rotationX = 0.5;
-	rotationY = 2;
+	rotationX = -3.25;
+	rotationY = 3.7;
 
-	Quaternion q1(0.5f, 0.86f, 0.0f, 0.0f);
-	Quaternion q2 = q1.conj();
-	std::cout << q2.w << q2.x << q2.y << q2.z << std::endl;
+	spline.addPoints(Vec3(-4.5f, 0.3f, -1.4f), EulerAngle(0.1f, 6.2f, 1.3f).mult(rotateScale));
+	spline.addPoints(Vec3(-2.6f, 0, -3.6f), EulerAngle(0.3f, 3.2f, 2.3f).mult(rotateScale));
+	spline.addPoints(Vec3(2, 2, -4), EulerAngle(5.7f, 0.2f, 0.0f).mult(rotateScale));
+	spline.addPoints(Vec3(3.7f, 1, 1.0f), EulerAngle(1.1f, 3.2f, -2.3f).mult(rotateScale));
+	spline.addPoints(Vec3(1, 0.6f, 4.5f), EulerAngle(3.7f, 2.2f, -1.3f).mult(rotateScale));
+	spline.addPoints(Vec3(-1.5f, 1.3f, 2.2f), EulerAngle(-0.3f, -4.2f, 0.5f).mult(rotateScale));
+	spline.addPoints(Vec3(-3.3f, 0.8f, 4.3f), EulerAngle(0.9f, -2.2f, 0.9f).mult(rotateScale));
+	spline.addPoints(Vec3(-5.4f, 0.1f, 2.3f), EulerAngle(0.5f, -1.2f, 4.0f).mult(rotateScale));
+
 }
 
 void draw(glm::mat4 m_vp) {
 	// Draw Ground
 	ground.render(glm::value_ptr(m_vp));
 	// Draw Models
-	glm::mat4 m_model_1 = glm::make_mat4(m_trans);
 	teapot.render(glm::value_ptr(m_vp));
-	teacup.render(glm::value_ptr(m_vp * m_model_1));
+
+	if (isPlay) {
+		segment_t += deltaTime;
+		total_t = curve_patch + segment_t;
+	}
+	if (segment_t >= 1) {
+
+		segment_t = 0;
+		++curve_patch;
+
+		if (curve_patch >= spline.total_t) {
+			curve_patch = 0;
+			segment_t = 0;
+			total_t = 0;
+		}
+	}
+
+	m_trans[12] = spline.posAtT(segment_t, curve_patch).x;
+	m_trans[13] = spline.posAtT(segment_t, curve_patch).y;
+	m_trans[14] = spline.posAtT(segment_t, curve_patch).z;
+	glm::mat4 m_translate = glm::make_mat4(m_trans);
+
+	glm::mat4 m_rotation = glm::mat4(1.0f);
+	if (orientation_scheme == QUATERNION) {
+		m_rotation = glm::make_mat4(spline.quatAtT(segment_t, curve_patch).toRotMatrix());
+	}
+	else {
+		m_rotation = glm::make_mat4(spline.eulerAtT(segment_t, curve_patch).toRotMatrix());
+	}
+	teacup.render(glm::value_ptr(m_vp * m_translate * m_rotation));
+
+	spline.render(glm::value_ptr(m_vp), ctrlPointIndex);
 }
 
 void imgui_func() {
+	ImGui::Begin("Inspector", &my_tool_active, ImGuiWindowFlags_MenuBar);
 
 	ImGui::SliderFloat("Cam FOV", &fov, 10.0f, 170.0f);
 	ImGui::Checkbox("IsOrtho", &isOrtho);
-	ImGui::SliderFloat("Trans X", &m_trans[12], -2.0f, 2.0f);
-	ImGui::SliderFloat("Trans Y", &m_trans[13], -2.0f, 2.0f);
-	ImGui::SliderFloat("Trans Z", &m_trans[14], -2.0f, 2.0f);
+	ImGui::Combo("Orientation", &orientation_scheme, "Quaternion\0Euler");
+
+	// Curve Parameters
+	ImGui::Combo("Curve Type", &curve_type_index, "CatmullRom\0B-Spline");
+	spline.curveType = CURVE_TYPE(curve_type_index);
+	ImGui::DragInt("Index", &ctrlPointIndex, 0.05f, 0, int(spline.ctrlPoints_pos.size()) - 1);
+	selectedPos[0] = spline.ctrlPoints_pos[ctrlPointIndex].x;
+	selectedPos[1] = spline.ctrlPoints_pos[ctrlPointIndex].y;
+	selectedPos[2] = spline.ctrlPoints_pos[ctrlPointIndex].z;
+	ImGui::DragFloat3("Pos", selectedPos, 0.01f, -100.0f, 100.0f);
+	spline.ctrlPoints_pos[ctrlPointIndex].x = selectedPos[0];
+	spline.ctrlPoints_pos[ctrlPointIndex].y = selectedPos[1];
+	spline.ctrlPoints_pos[ctrlPointIndex].z = selectedPos[2];
 
 	ImGui::SetWindowPos(ImVec2(0, 0));
 
-	is_hovering = ImGui::IsWindowFocused() || ImGui::IsItemFocused();
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("Save Path", "Ctrl+S")) {
+				// TODO: Do something!!!!!!!
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
+
+	is_hovering = ImGui::IsAnyWindowFocused() || ImGui::IsAnyItemFocused();
+	ImGui::End();
+
+	ImGui::Begin("Timeline");
+	ImGui::SetWindowPos(ImVec2(0, viewport_height - 100));
+	ImGui::SetWindowSize(ImVec2(viewport_width, 100));
+	if (ImGui::Button("Play/Pause")) {
+		isPlay = !isPlay;
+	}
+	ImGui::SameLine();
+	ImGui::SliderFloat("time", &total_t, 0.0f, spline.total_t);
+	curve_patch = int(floor(total_t));
+	segment_t = total_t - curve_patch;
+	//segment_t = constrain(segment_t, 0.0f, 1.0f);
+	//std::cout << segment_t << "\t" << curve_patch << "\t" << total_t << std::endl;
+	ImGui::End();
 }
 
 void glut_display_func() {
@@ -90,8 +183,8 @@ void glut_display_func() {
 	ImGui_ImplGLUT_NewFrame();
 	imgui_func();
 	ImGui::Render();
-	
-	glClear(GL_COLOR_BUFFER_BIT);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// ---------- Mouse Control -----------------
 	cam2pref = lerp(cam2pref, cam2prefLerp, 0.2f);
@@ -103,8 +196,9 @@ void glut_display_func() {
 	cam_pos[1] = rotationY;
 	cam_pos[2] = sin(rotationX - PI / 2) * cam2pref;
 
+	// ---------- View & Projection Matrices -----------
 	glm::mat4 m_persp = glm::perspective(glm::radians(fov), viewport_width / (float)viewport_height, 0.1f, 100.0f);
-	float w = map(glm::tan(glm::radians(fov / 2)), 0, PI/2, 2, 8);
+	float w = map(glm::tan(glm::radians(fov / 2)), 0, PI / 2, 2, 8);
 	float h = w / (float)viewport_width * viewport_height;
 	glm::mat4 m_ortho = glm::ortho(-w, w, -h, h, 0.1f, 100.0f);
 	glm::mat4 m_proj = isOrtho ? m_ortho : m_persp;
@@ -134,7 +228,7 @@ void glut_reshape_func(int width, int height) {
 
 void glut_timer_func(int val) {
 	glut_display_func();
-	deltaTime += 1000.0 / frameRate;
+	deltaTime = 1.0f / frameRate;
 	glutTimerFunc(1000.0 / frameRate, glut_timer_func, 0);
 }
 
@@ -175,10 +269,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(window_width, window_height);
 	glutInitWindowPosition(100, 100);
-	glViewport(0, 0, window_width, window_height);
-	gluPerspective(90, window_width / window_height, 0, 0000);
 	glutCreateWindow("Lab1");
-
 
 	// Lab Program Setup
 	setup();
@@ -196,6 +287,7 @@ int main(int argc, char** argv) {
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	ImGui::StyleColorsDark();
+	ImGui::StyleColorsClassic();
 	ImGui_ImplGLUT_Init();
 	//ImGui_ImplGLUT_InstallFuncs();
 	ImGui_ImplOpenGL2_Init();
@@ -208,7 +300,6 @@ int main(int argc, char** argv) {
 	ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplGLUT_Shutdown();
 	ImGui::DestroyContext();
-
 
 	return 0;
 }

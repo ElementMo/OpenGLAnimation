@@ -13,10 +13,12 @@ public:
 	Quaternion();
 	Quaternion(float w, float x, float y, float z);
 	~Quaternion();
-	float dot(const Quaternion& q);
-	Quaternion H(const Quaternion& q);
-	Quaternion conj();
-	float modSquare();
+	float dot(const Quaternion& q) const;
+	float mod();
+	void normalize();
+	Quaternion H(const Quaternion& q) const;
+	Quaternion conj() const;
+	float modSquare() const;
 	Quaternion rotateBy(const Quaternion& q);
 	GLfloat* toRotMatrix();
 };

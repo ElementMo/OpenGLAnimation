@@ -45,6 +45,12 @@
     <ClCompile Include="Quaternion.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="EulerAngle.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Spline.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -150,6 +156,12 @@
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Quaternion.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="EulerAngle.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Spline.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

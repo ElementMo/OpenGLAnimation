@@ -48,6 +48,7 @@ void Model::scale(float s)
 
 void Model::render(const GLfloat *m_mvp)
 {
+	glLineWidth(1.0f);
 	glPushMatrix();
 	glLoadMatrixf(m_mvp);
 	glColor3f(model_color[0], model_color[1], model_color[2]);
