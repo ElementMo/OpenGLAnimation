@@ -42,7 +42,7 @@ float m_trans[16] = {
 	0, 0, 0, 1
 };
 bool my_tool_active = true;
-float rotateScale = PI * 5;
+float rotateScale = PI * 1;
 int ctrlPointIndex = 0;
 float selectedPos[3];
 
@@ -78,12 +78,12 @@ void setup() {
 
 	spline.addPoints(Vec3(-4.5f, 0.3f, -1.4f), EulerAngle(0.1f, 6.2f, 1.3f).mult(rotateScale));
 	spline.addPoints(Vec3(-2.6f, 0, -3.6f), EulerAngle(0.3f, 3.2f, 2.3f).mult(rotateScale));
-	spline.addPoints(Vec3(2, 2, -4), EulerAngle(5.7f, 0.2f, 0.0f).mult(rotateScale));
-	spline.addPoints(Vec3(3.7f, 1, 1.0f), EulerAngle(1.1f, 3.2f, -2.3f).mult(rotateScale));
+	spline.addPoints(Vec3(2, 2, -4), EulerAngle(2.7f, 0.2f, 0.1f).mult(rotateScale));
+	spline.addPoints(Vec3(3.7f, 1, 1.0f), EulerAngle(1.1f, 2.2f, 0.3f).mult(rotateScale));
 	spline.addPoints(Vec3(1, 0.6f, 4.5f), EulerAngle(3.7f, 2.2f, -1.3f).mult(rotateScale));
-	spline.addPoints(Vec3(-1.5f, 1.3f, 2.2f), EulerAngle(-0.3f, -4.2f, 0.5f).mult(rotateScale));
-	spline.addPoints(Vec3(-3.3f, 0.8f, 4.3f), EulerAngle(0.9f, -2.2f, 0.9f).mult(rotateScale));
-	spline.addPoints(Vec3(-5.4f, 0.1f, 2.3f), EulerAngle(0.5f, -1.2f, 4.0f).mult(rotateScale));
+	spline.addPoints(Vec3(-1.5f, 1.3f, 2.2f), EulerAngle(2.3f, 1.2f, -3.3f).mult(rotateScale));
+	spline.addPoints(Vec3(-3.3f, 0.8f, 4.3f), EulerAngle(1.9f, -2.2f, 0.9f).mult(rotateScale));
+	spline.addPoints(Vec3(-5.4f, 0.1f, 2.3f), EulerAngle(0.3f, 3.2f, 2.3f).mult(rotateScale));
 
 }
 

@@ -100,12 +100,12 @@ Vec3 Spline::posAtT(float t, int patch)
 		TM[3] = TxM(T, blendMat_BSpline)[3];
 	}
 
-	float batch_x[4] = { ctrlPoints_pos[patch].x, ctrlPoints_pos[patch + 1].x, ctrlPoints_pos[patch + 2].x, ctrlPoints_pos[patch + 3].x };
-	float batch_y[4] = { ctrlPoints_pos[patch].y, ctrlPoints_pos[patch + 1].y, ctrlPoints_pos[patch + 2].y, ctrlPoints_pos[patch + 3].y };
-	float batch_z[4] = { ctrlPoints_pos[patch].z, ctrlPoints_pos[patch + 1].z, ctrlPoints_pos[patch + 2].z, ctrlPoints_pos[patch + 3].z };
-	result.x = TMxG(TM, batch_x);
-	result.y = TMxG(TM, batch_y);
-	result.z = TMxG(TM, batch_z);
+	float patch_x[4] = { ctrlPoints_pos[patch].x, ctrlPoints_pos[patch + 1].x, ctrlPoints_pos[patch + 2].x, ctrlPoints_pos[patch + 3].x };
+	float patch_y[4] = { ctrlPoints_pos[patch].y, ctrlPoints_pos[patch + 1].y, ctrlPoints_pos[patch + 2].y, ctrlPoints_pos[patch + 3].y };
+	float patch_z[4] = { ctrlPoints_pos[patch].z, ctrlPoints_pos[patch + 1].z, ctrlPoints_pos[patch + 2].z, ctrlPoints_pos[patch + 3].z };
+	result.x = TMxG(TM, patch_x);
+	result.y = TMxG(TM, patch_y);
+	result.z = TMxG(TM, patch_z);
 
 	return result;
 }

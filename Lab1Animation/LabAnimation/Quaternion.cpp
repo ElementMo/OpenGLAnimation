@@ -59,6 +59,7 @@ float Quaternion::modSquare() const
 
 Quaternion Quaternion::rotateBy(const Quaternion& q)
 {
+	// TODO: finish the A' = q*Aq algorithm
 	return Quaternion();
 }
 

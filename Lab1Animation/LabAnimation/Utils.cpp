@@ -73,6 +73,7 @@ Quaternion fromEuler(float x, float y, float z)
 	q.x = sinX * cosY * cosZ - cosX * sinY * sinZ;
 	q.y = cosX * sinY * cosZ + sinX * cosY * sinZ;
 	q.z = cosX * cosY * sinZ - sinX * sinY * cosZ;
+	//q.normalize();
 	return q;
 
 }

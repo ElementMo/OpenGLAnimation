@@ -25,9 +25,6 @@ Model::~Model()
 
 void Model::translate(float x, float y, float z)
 {
-	m_model_pos[12] = x;
-	m_model_pos[13] = y;
-	m_model_pos[14] = z;
 }
 
 void Model::rotate(float x, float y, float z)
