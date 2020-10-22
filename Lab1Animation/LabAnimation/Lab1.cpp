@@ -146,6 +146,7 @@ void imgui_func() {
 	spline.ctrlPoints_pos[ctrlPointIndex].z = selectedPos[2];
 
 	ImGui::SetWindowPos(ImVec2(0, 0));
+	ImGui::SetWindowSize(ImVec2(300, 350));
 
 	if (ImGui::BeginMenuBar())
 	{

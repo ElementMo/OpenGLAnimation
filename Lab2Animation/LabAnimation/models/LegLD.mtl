@@ -1,0 +1,12 @@
+# Blender MTL File: 'skeleton.blend'
+# Material Count: 1
+
+newmtl Bones___Vray
+Ns 9.849156
+Ka 1.000000 1.000000 1.000000
+Kd 0.584314 0.584314 0.584314
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
