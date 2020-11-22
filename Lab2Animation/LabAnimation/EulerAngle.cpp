@@ -41,7 +41,7 @@ GLfloat* EulerAngle::toRotMatrix()
 EulerAngle EulerAngle::mult(float scale) {
 	EulerAngle e;
 	e.x = this->x * scale;
-	e.y = this->x * scale;
-	e.z = this->x * scale;
+	e.y = this->y * scale;
+	e.z = this->z * scale;
 	return e;
 }
