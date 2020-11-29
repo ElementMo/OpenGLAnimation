@@ -38,10 +38,12 @@ bool my_tool_active = true;
 
 
 // ----------- Scene Parameters ---------
+bool showLight;
 GLfloat light_position[] = { -10.0, 10.0, -10.0, 1.0 };
 GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
 GLfloat light_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat light_specular[] = { 0.0, 0.0, 0.0, 1.0 };
+GLfloat bg_color[] = { 0.2, 0.31, 0.42, 1.0 };
 
 Model boid_model("boid.obj");
 float ground_col[3] = { 0.8f, 0.6f, 0.9f };
@@ -49,10 +51,11 @@ Model ground("ground", ground_col);
 Model light_bulb("LightBulb.obj");
 
 // ----------- Flock World -------------
-Flock flock;
-Octree* octree;
+Flock flock(30.0f);
+bool showOctree;
+//Octree* octree;
 
-float param1 = 3.0f;
+float param1 = 5.0f;
 float param2 = 0.5f;
 float param3 = 0.05f;
 float param4 = 0;
@@ -75,13 +78,14 @@ void setup() {
 
 	boid_model.setRenderMode(GL_FILL);
 
-	for (int i = 0; i < 50; i++)
+	int range = 15;
+	for (int i = 0; i < 400; i++)
 	{
-		Boid b(boid_model, Random(-5, 5), Random(-5, 5), Random(-5, 5));
+		Boid b(boid_model, Random(-range, range), Random(-range, range), Random(-range, range));
 		flock.AddBoid(b);
 	}
-	OTBox boundary(0, 0, 0, 10, 10, 10);
-	octree = new Octree(boundary, 4);
+	//OTBox boundary(0, 0, 0, 10, 10, 10);
+	//octree = new Octree(boundary, 4);
 
 	//int range = 8;
 	//for (int i = 0; i < 1000; i++)
@@ -96,11 +100,14 @@ void setup() {
 
 
 void draw(glm::mat4 m_vp) {
+	glClearColor(bg_color[0], bg_color[1], bg_color[2], 0.0f);
+
 	//std::cout << rotationX << "--" << rotationY << std::endl;
 	// Draw Ground
-	ground.render(m_vp, glm::mat4(1.0), false);
+	//ground.render(m_vp, glm::mat4(1.0), false);
 
-	light_bulb.render(m_vp, glm::translate(glm::mat4(1.0f), glm::vec3(light_position[0], light_position[1], light_position[2])), false);
+	if (showLight)
+		light_bulb.render(m_vp, glm::translate(glm::mat4(1.0f), glm::vec3(light_position[0], light_position[1], light_position[2])), false);
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -114,7 +121,7 @@ void draw(glm::mat4 m_vp) {
 	flock.Simulate();
 
 	// Redner Flock
-	flock.Render(m_vp);
+	flock.Render(m_vp, showOctree);
 
 	// Set Boid parameters
 	flock.SetRadius(param1);
@@ -132,8 +139,7 @@ void draw(glm::mat4 m_vp) {
 	//	glDrawBox(queryPoints[i].x, queryPoints[i].y, queryPoints[i].z, 0.15f, 0.15f, 0.15f, 0, 1, 0);
 	//}
 
-
-	octree->Show(m_vp);
+	//octree->Show(m_vp);
 }
 
 void imgui_func() {
@@ -142,17 +148,20 @@ void imgui_func() {
 	ImGui::SliderFloat("Cam FOV", &fov, 10.0f, 170.0f);
 	ImGui::Checkbox("IsOrtho", &isOrtho);
 
-	ImGui::SliderFloat("Radius", &param1, 0.5f, 5.0f);
+	ImGui::SliderFloat("Radius", &param1, 3.0f, 9.0f);
 	ImGui::SliderFloat("MaxSpeed", &param2, 0.01f, 1.0f);
 	ImGui::SliderFloat("MaxSteerForce", &param3, 0.001f, 0.5f);
-	ImGui::DragFloat3("Param1", param_offset_1, 0.1f, -10.0f, 10.0f);
-	ImGui::DragFloat3("Param2", param_offset_2, 0.1f, -10.0f, 10.0f);
+	//ImGui::DragFloat3("Param1", param_offset_1, 0.1f, -10.0f, 10.0f);
+	//ImGui::DragFloat3("Param2", param_offset_2, 0.1f, -10.0f, 10.0f);
 
+	ImGui::Checkbox("Show Octree", &showOctree);
 
 	ImGui::DragFloat3("Light Pos", light_position, 0.1f, -10.0f, 10.0f);
+	ImGui::Checkbox("Show Light", &showLight);
 	//ImGui::ColorPicker4("Light Ambient", light_ambient);
 	//ImGui::ColorPicker4("Light Diffuse", light_diffuse);
 	//ImGui::ColorPicker4("Light Specular", light_specular);
+	ImGui::ColorPicker4("Backgound Color", bg_color);
 	if (ImGui::Button("Reset")) {
 		flock.Reset();
 	}
@@ -275,7 +284,7 @@ int main(int argc, char** argv) {
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	glutInitWindowSize(window_width, window_height);
 	glutInitWindowPosition(100, 100);
-	glutCreateWindow("Lab1");
+	glutCreateWindow("ComputerAnimation");
 
 	// Lab Program Setup
 	setup();

@@ -11,6 +11,7 @@ public:
 	float radius;
 	float maxForce;
 	float maxSpeed;
+	int maxDetect;
 
 	Boid(Model& model, float x, float y, float z);
 	void Simulate(std::vector<Boid> boids);
@@ -22,4 +23,6 @@ public:
 	glm::vec3 Seperate(std::vector<Boid> boids);
 	glm::vec3 Align(std::vector<Boid> boids);
 	glm::vec3 Cohesion(std::vector<Boid> boids);
+
+	void BoundaryCheck(float w, float h, float d);
 };

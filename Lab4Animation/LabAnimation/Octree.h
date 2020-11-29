@@ -29,4 +29,5 @@ public:
 	bool Insert(OTPoint& p);
 	std::vector<OTPoint> Query(OTBox& queryBoundary, std::vector<OTPoint> found);
 	void Show(const glm::mat4 m_vp);
+	void Clear();
 };

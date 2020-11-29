@@ -144,3 +144,19 @@ void Octree::Show(const glm::mat4 m_vp)
 		drb->Show(m_vp);
 	}
 }
+
+void Octree::Clear()
+{
+	points.clear();
+	if (isDivided) {
+		ulf->Clear();
+		urf->Clear();
+		ulb->Clear();
+		urb->Clear();
+
+		dlf->Clear();
+		drf->Clear();
+		dlb->Clear();
+		drb->Clear();
+	}
+}
