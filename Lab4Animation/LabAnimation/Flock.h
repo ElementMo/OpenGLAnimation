@@ -6,6 +6,7 @@
 class Flock {
 public:
 	std::vector<Boid> boids;
+	std::vector<glm::vec3> predators;
 	Octree* octree;
 	float flockSize;
 
@@ -24,4 +25,5 @@ public:
 	void SetRadius(float r);
 	void SetMaxSpeed(float s);
 	void SetMaxForce(float f);
+	void SetPredatorRange(float r);
 };

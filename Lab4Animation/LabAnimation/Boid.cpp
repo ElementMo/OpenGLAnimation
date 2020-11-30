@@ -5,15 +5,44 @@ Boid::Boid(Model& model, float x, float y, float z) {
 	acceleration = glm::vec3(0);
 	velocity = glm::vec3(Random(-PI, PI), Random(-PI, PI), Random(-PI, PI));
 	position = glm::vec3(x, y, z);
-	radius = 3.0f;
+	radius = 7.0f;
 	maxSpeed = 0.5f;
 	maxForce = 0.05f;
-	maxDetect = 10;
+	maxDetect = 10.0f;
+	predatorDetectRadius = 25;
 }
 
 void Boid::Simulate(std::vector<Boid> boids) {
 	Flock(boids);
 	Update();
+}
+
+void Boid::AvoidPredators(std::vector<glm::vec3> predators)
+{
+	glm::vec3 steer_sum = glm::vec3(0);
+	int count = 0;
+
+	for (int i = 0; i < predators.size(); i++)
+	{
+		float d = glm::distance(position, predators[i]);
+		if (d < predatorDetectRadius) {
+			glm::vec3 relative_v = position - predators[i];
+			steer_sum += relative_v;
+			count++;
+		}
+	}
+
+	if (count > 0) {
+		steer_sum /= count;
+	}
+	if (glm::length(steer_sum) > 0) {
+		steer_sum = glm::normalize(steer_sum) * maxSpeed;
+		steer_sum = steer_sum - velocity;
+		steer_sum = glm::normalize(steer_sum) * maxForce * 3.0f;
+		ApplyForce(steer_sum);
+		Update();
+	}
+
 }
 
 void Boid::ApplyForce(glm::vec3 force) {

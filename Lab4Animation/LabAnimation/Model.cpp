@@ -272,11 +272,12 @@ void Model::render(const glm::mat4 m_vp, const glm::mat4 m_model, bool enable_li
 		glutWireTeacup(1);
 	}
 	else if (fileName == "ground") {
+		int groundSize = 50;
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		int xsize = 1, zsize = 1;
-		for (int j = -10; j < 10; j += zsize)
+		for (int j = -groundSize; j < groundSize; j += zsize)
 		{
-			for (int i = -10; i < 10; i += xsize)
+			for (int i = -groundSize; i < groundSize; i += xsize)
 			{
 				glBegin(GL_POLYGON);
 				glVertex3f(i * xsize, 0.0, j * zsize);

@@ -8,7 +8,7 @@ void Flock::Simulate()
 {
 	// Re-create octree
 	delete octree;
-	OTBox boundary(0, 0, 0, flockSize, flockSize / 2, flockSize / 2);
+	OTBox boundary(0, 0, 0, flockSize, flockSize / 2, flockSize);
 	octree = new Octree(boundary, 5);
 
 	// Insert boid into octree
@@ -26,8 +26,9 @@ void Flock::Simulate()
 		for (int i = 0; i < nearbyPoints.size(); i++) {
 			nearby.push_back(boids[nearbyPoints[i].index]);
 		}
+		boids[i].AvoidPredators(predators);
 		boids[i].Simulate(nearby);
-		boids[i].BoundaryCheck(flockSize, flockSize / 2, flockSize / 2);
+		boids[i].BoundaryCheck(flockSize, flockSize / 2, flockSize);
 	}
 
 }
@@ -47,6 +48,8 @@ void Flock::Render(const glm::mat4 m_vp, bool showOctree)
 	}
 }
 
+
+
 void Flock::AddBoid(Boid& boid)
 {
 	boids.push_back(boid);
@@ -63,7 +66,7 @@ void Flock::SetLighting(float pos[4], float amb[4], float diff[4], float spec[4]
 }
 
 void Flock::Reset() {
-	int range = flockSize/2;
+	int range = flockSize / 2;
 	for (int i = 0; i < boids.size(); i++)
 	{
 		boids[i].acceleration *= 0;
@@ -90,5 +93,13 @@ void Flock::SetMaxForce(float f) {
 	for (int i = 0; i < boids.size(); i++)
 	{
 		boids[i].maxForce = f;
+	}
+}
+
+void Flock::SetPredatorRange(float r)
+{
+	for (int i = 0; i < boids.size(); i++)
+	{
+		boids[i].predatorDetectRadius = r;
 	}
 }

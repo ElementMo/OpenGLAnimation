@@ -12,9 +12,11 @@ public:
 	float maxForce;
 	float maxSpeed;
 	int maxDetect;
+	float predatorDetectRadius;
 
 	Boid(Model& model, float x, float y, float z);
 	void Simulate(std::vector<Boid> boids);
+	void AvoidPredators(std::vector<glm::vec3> predators);
 
 	void ApplyForce(glm::vec3 force);
 	void Flock(std::vector<Boid> boids);

@@ -5,6 +5,7 @@
 #include "imgui/imgui_impl_opengl2.h"
 #include <GL/freeglut.h>
 #include "Utils.h"
+#include "Spline.h"
 #include "Model.h"
 #include "Boid.h"
 #include "Flock.h"
