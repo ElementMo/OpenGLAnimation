@@ -23,8 +23,8 @@ void Flock::Simulate()
 		std::vector<OTPoint> nearbyPoints;
 		nearbyPoints = octree->Query(range, nearbyPoints);
 		std::vector<Boid> nearby;
-		for (int i = 0; i < nearbyPoints.size(); i++) {
-			nearby.push_back(boids[nearbyPoints[i].index]);
+		for (int j = 0; j < nearbyPoints.size(); j++) {
+			nearby.push_back(boids[nearbyPoints[j].index]);
 		}
 		boids[i].AvoidPredators(predators);
 		boids[i].Simulate(nearby);

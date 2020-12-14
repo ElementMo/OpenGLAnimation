@@ -73,9 +73,9 @@ std::vector<Model> seaweeds;
 std::vector<glm::vec3> seaweeds_pos;
 glm::vec3 predator_prepos;
 
-float param1 = 7.0f;
-float param2 = 0.45f;
-float param3 = 0.08f;
+float param1 = 5.0f;
+float param2 = 0.25f;
+float param3 = 0.04f;
 float param4 = 0;
 float param_offset_1[3] = { 1,0,0 };
 float param_offset_2[3] = { 1,1,1 };
@@ -98,7 +98,7 @@ void setup() {
 	boid_model_2.setRenderMode(GL_FILL);
 	shark_model.setRenderMode(GL_FILL);
 
-	for (int i = 0; i < 400; i++)
+	for (int i = 0; i < 500; i++)
 	{
 		if (i % 2 == 0) {
 			Boid b(boid_model_1, Random(-30, 30), Random(-15, 15), Random(-30, 30));
